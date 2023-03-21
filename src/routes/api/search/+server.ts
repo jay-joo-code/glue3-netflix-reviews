@@ -5,8 +5,6 @@ import { json } from '@sveltejs/kit';
 export async function POST({ request }) {
 	const { query } = await request.json();
 
-	console.log('query', query);
-
 	try {
 		const url = `https://www.googleapis.com/youtube/v3/search?key=${GOOGLE_API_KEY}&part=snippet,id&order=relevance&maxResults=4&channelType=any&q=${encodeURIComponent(
 			query
@@ -43,7 +41,6 @@ export async function POST({ request }) {
 			reviews
 		});
 	} catch (error) {
-		console.log('error', error);
 		return json({
 			success: false,
 			error
