@@ -3,9 +3,9 @@
 	import Main from '$lib/components/glue/Main.svelte';
 	import PageContainer from '$lib/components/glue/PageContainer.svelte';
 	import TextInput from '$lib/components/glue/TextInput.svelte';
-	import { formatDistanceStrict, formatDistanceToNowStrict } from 'date-fns';
+	import { formatDistanceToNowStrict } from 'date-fns';
 
-	let query = 'the recruit';
+	let query = '';
 	let reviews = [];
 
 	const handleSearch = async () => {
@@ -20,7 +20,12 @@
 				}
 			})
 		)?.json();
-		reviews = data?.reviews;
+
+		if (data?.success) {
+			reviews = data?.reviews;
+		} else {
+			console.log(data?.error);
+		}
 	};
 </script>
 
