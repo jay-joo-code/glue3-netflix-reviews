@@ -34,7 +34,7 @@ export async function POST({ request }) {
 			}));
 		});
 
-		const reviews = (await Promise.all(promises))?.flat();
+		const reviews = (await Promise.all(promises))?.flat()?.filter((review) => review?.content);
 
 		return json({
 			success: true,
