@@ -17,13 +17,13 @@ export async function POST({ request }) {
 		)?.json();
 
 		const promises = videoData?.items?.map(async (video) => {
-			const url = `https://www.googleapis.com/youtube/v3/commentThreads?key=${GOOGLE_API_KEY}&part=snippet,id&videoId=${video?.id?.videoId}&order=time`;
-			const data = await (
-				await fetch(url, {
+			const recentCommentsUrl = `https://www.googleapis.com/youtube/v3/commentThreads?key=${GOOGLE_API_KEY}&part=snippet,id&videoId=${video?.id?.videoId}&order=time`;
+			const recentCommentsData = await (
+				await fetch(recentCommentsUrl, {
 					method: 'GET'
 				})
 			)?.json();
-			return data?.items
+			const recentComments = recentCommentsData?.items
 				?.slice(0, 20)
 				?.map((comment) => ({
 					content: comment?.snippet?.topLevelComment?.snippet?.textOriginal,
@@ -35,6 +35,29 @@ export async function POST({ request }) {
 					videoPublished: video?.snippet?.publishTime
 				}))
 				?.filter((review) => review?.content);
+
+			const relevantCommentsUrl = `https://www.googleapis.com/youtube/v3/commentThreads?key=${GOOGLE_API_KEY}&part=snippet,id&videoId=${video?.id?.videoId}&order=relevance`;
+			const relevantCommentsData = await (
+				await fetch(relevantCommentsUrl, {
+					method: 'GET'
+				})
+			)?.json();
+
+			const mostUpvotedComments = relevantCommentsData?.items
+				?.map((comment) => ({
+					content: comment?.snippet?.topLevelComment?.snippet?.textOriginal,
+					likeCount: comment?.snippet?.topLevelComment?.snippet?.likeCount,
+					updated: comment?.snippet?.topLevelComment?.snippet?.updatedAt,
+					videoId: video?.id?.videoId,
+					videoTitle: video?.snippet?.title,
+					videoChannel: video?.snippet?.channelTitle,
+					videoPublished: video?.snippet?.publishTime
+				}))
+				?.sort((a, b) => b?.likeCount - a?.likeCount)
+				?.filter((review) => review?.content)
+				?.slice(0, 5);
+
+			return [...mostUpvotedComments, ...recentComments];
 		});
 
 		const reviewGroups = await Promise.all(promises);

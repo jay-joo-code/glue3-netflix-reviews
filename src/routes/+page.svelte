@@ -51,7 +51,7 @@
 								</a>
 							</div>
 							{#each reviewGroup as review}
-								<div class="space-y-1 border-b border-base-content/10 py-2">
+								<div class="space-y-1 border-b border-base-content/10 py-2 [&:nth-child(6)]:mb-8">
 									<p class="text-sm">{review?.content}</p>
 									<p class="text-xs text-base-content/70">
 										<span class="font-semibold">{review?.likeCount}</span> likes • {formatDistanceToNowStrict(
