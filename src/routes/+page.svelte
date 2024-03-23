@@ -6,7 +6,7 @@
 	import { formatDistanceToNowStrict } from 'date-fns';
 
 	let query = '';
-	let reviews = [];
+	let reviewGroups = [];
 
 	const handleSearch = async () => {
 		const data = await (
@@ -22,7 +22,7 @@
 		)?.json();
 
 		if (data?.success) {
-			reviews = data?.reviews;
+			reviewGroups = data?.reviewGroups;
 		} else {
 			console.log(data?.error);
 		}
@@ -36,29 +36,32 @@
 			<button class="btn-primary btn">Search</button>
 		</form>
 		<div class="mt-4">
-			{#if reviews}
-				{#each reviews as review}
-					<div class="space-y-1 border-b border-base-content/10 py-2">
-						<p class="text-sm">{review?.content}</p>
-						<p class="text-xs text-base-content/70">
-							<span class="font-semibold">{review?.likeCount}</span> likes • {formatDistanceToNowStrict(
-								new Date(review?.updated)
-							)} ago
-						</p>
-						<div class="flex items-center">
-							<a
-								class="link mr-1 text-xs text-base-content/70 no-underline hover:underline"
-								href={review?.videoId}
-								target="_blank"
-								rel="noopener noreferrer">{review?.videoTitle}</a
-							>
-							<p class="text-xs text-base-content/70">
-								• {review?.videoChannel} • {formatDistanceToNowStrict(
-									new Date(review?.videoPublished)
-								)} ago
-							</p>
+			{#if reviewGroups}
+				{#each reviewGroups as reviewGroup}
+					{#if reviewGroup && reviewGroup?.length > 0}
+						<div class="my-12">
+							<div class="mb-4 flex items-center gap-8">
+								<a
+									class="link text-2xl font-extrabold no-underline hover:underline"
+									href="https://www.youtube.com/watch?v={reviewGroup[0]?.videoId}"
+									target="_blank"
+									rel="noopener noreferrer"
+								>
+									{reviewGroup[0]?.videoTitle}
+								</a>
+							</div>
+							{#each reviewGroup as review}
+								<div class="space-y-1 border-b border-base-content/10 py-2">
+									<p class="text-sm">{review?.content}</p>
+									<p class="text-xs text-base-content/70">
+										<span class="font-semibold">{review?.likeCount}</span> likes • {formatDistanceToNowStrict(
+											new Date(review?.updated)
+										)} ago
+									</p>
+								</div>
+							{/each}
 						</div>
-					</div>
+					{/if}
 				{/each}
 			{/if}
 		</div>
